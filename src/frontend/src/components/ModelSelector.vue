@@ -2,9 +2,27 @@
   <div class="relative" ref="containerRef">
     <label v-if="label" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ label }}</label>
     <div class="relative">
+      <!--
+        #2796: this field is free text, so a password manager's heuristic fill
+        can treat it as the username of a saved login for the origin. Trinity's
+        Admin Login fixes that username as `admin` (Login.vue), and the value a
+        manager drops here is persisted by the consumer (ChatPanel.vue stores it
+        in `trinity_chat_model`) and sent as `model` on every subsequent send —
+        so one stray fill turns into a run of `unrecognized_model` failures, not
+        a single one. `autocomplete="off"` is advisory on its own; the four
+        `data-*` attributes are the per-manager opt-outs each vendor documents.
+        Named, and named non-credentially, so the heuristics have something to
+        read. Covered by tests/unit/modelSelectorAutofill.spec.js.
+      -->
       <input
         ref="inputRef"
         type="text"
+        name="trinity-model"
+        autocomplete="off"
+        data-lpignore="true"
+        data-1p-ignore
+        data-bwignore
+        data-form-type="other"
         :value="modelValue"
         @input="onInput"
         @focus="showDropdown = true"
